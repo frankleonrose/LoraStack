@@ -1,0 +1,36 @@
+{
+  "name": "LoraStack",
+  "keywords": "ttn, lora, things, network",
+  "description": "Arduino Library for LoraWAN and The Things Network",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/things-nyc/LoraStack.git"
+  },
+  "authors":
+  [
+    {
+      "name": "Frank Leon Rose",
+      "email": "frank@thethings.nyc",
+      "maintainer": true
+    }
+  ],
+  "dependencies":
+  [
+    {
+      "version": "https://github.com/frankleonrose/arduino-lorawan.git#feat-platformio",
+      "authors": ["Terry Moore <tmm@mcci.com>", "ChaeHee Won"]
+    },
+    {
+      "version": "https://github.com/frankleonrose/Arduino-logging-library.git"
+    },
+    {
+      "name": "ParameterStore",
+      "version": "https://github.com/frankleonrose/ParameterStore.git",
+      "authors": ["Frank Leon Rose <frankleonrose@gmail.com>"]
+    }
+  ],
+  "version": "0.1.0",
+  "frameworks": "arduino",
+  "platforms": "*"
+}

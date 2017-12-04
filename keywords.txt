@@ -1,0 +1,9 @@
+ParameterStore    KEYWORD1
+NonVolatileStore  KEYWORD1
+get       KEYWORD2
+set       KEYWORD2
+size      KEYWORD2
+read      KEYWORD2
+readbyte  KEYWORD2
+readu16   KEYWORD2
+readu32   KEYWORD2
