@@ -328,16 +328,24 @@ LoraStack_LoRaWAN::LoraStack_LoRaWAN(
 bool LoraStack_LoRaWAN::GetOtaaProvisioningInfo(
     OtaaProvisioningInfo *pProvisioningInfo
   ) {
+  LS_LOG_DEBUG(F("GetOtaaProvisioningInfo %x" CR), pProvisioningInfo);
   static_assert(32==sizeof(OtaaProvisioningInfo), "Unexpected OTAA provisioning requirement");
-  int ret1 = _store.get("APPEUI", pProvisioningInfo->AppEUI, sizeof(pProvisioningInfo->AppEUI));
-  int ret2 = _store.get("APPKEY", pProvisioningInfo->AppKey, sizeof(pProvisioningInfo->AppKey));
-  int ret3 = _store.get("DEVEUI", pProvisioningInfo->DevEUI, sizeof(pProvisioningInfo->DevEUI));
-  return ret1==PS_SUCCESS && ret2==PS_SUCCESS && ret3==PS_SUCCESS;
+  if (pProvisioningInfo) {
+    int ret1 = _store.get("APPEUI", pProvisioningInfo->AppEUI, sizeof(pProvisioningInfo->AppEUI));
+    int ret2 = _store.get("APPKEY", pProvisioningInfo->AppKey, sizeof(pProvisioningInfo->AppKey));
+    int ret3 = _store.get("DEVEUI", pProvisioningInfo->DevEUI, sizeof(pProvisioningInfo->DevEUI));
+    return ret1==PS_SUCCESS && ret2==PS_SUCCESS && ret3==PS_SUCCESS;
+  }
+  else {
+    LS_LOG_DEBUG(F("Need to figure out whether there is OTAA configuration in parameter store." CR));
+    return false;
+  }
 }
 
 bool LoraStack_LoRaWAN::GetAbpProvisioningInfo(
 		AbpProvisioningInfo *pProvisioningInfo
   ) {
+  LS_LOG_DEBUG(F("GetAbpProvisioningInfo %x" CR), pProvisioningInfo);
   static_assert(48==sizeof(AbpProvisioningInfo), "Unexpected ABP provisioning requirement");
   int ret1 = _store.get("NWKSKEY", pProvisioningInfo->NwkSKey, sizeof(pProvisioningInfo->NwkSKey));
   int ret2 = _store.get("APPSKEY", pProvisioningInfo->AppSKey, sizeof(pProvisioningInfo->AppSKey));
@@ -346,12 +354,13 @@ bool LoraStack_LoRaWAN::GetAbpProvisioningInfo(
 
   int ret5 = _store.get("FCNTUP", &pProvisioningInfo->FCntUp);
   if (ret5!=PS_SUCCESS) {
-    LS_LOG_INFO(F("Failed to load Up frame counter (%d)"), ret5);
+    LS_LOG_INFO(F("Failed to load Up frame counter (%d)" CR), ret5);
   }
   int ret6 = _store.get("FCNTDN", &pProvisioningInfo->FCntDown);
   if (ret6!=PS_SUCCESS) {
-    LS_LOG_INFO(F("Failed to load Down frame counter (%d)"), ret6);
+    LS_LOG_INFO(F("Failed to load Down frame counter (%d)" CR), ret6);
   }
+  // Don't include ret5 & ret6 in return value. They aren't absolutely required for ABP.
   return ret1==PS_SUCCESS && ret2==PS_SUCCESS && ret3==PS_SUCCESS && ret4==PS_SUCCESS;
 }
 
@@ -362,6 +371,7 @@ bool LoraStack_LoRaWAN::GetSavedSessionInfo(
     size_t nExtraSessionInfo,
     size_t *pnExtraSessionActual
     ) {
+  LS_LOG_DEBUG(F("GetSavedSessionInfo %x" CR), pSessionInfo);
   pSessionInfo->V1.Tag = kSessionInfoTag_V1;
   pSessionInfo->V1.Size = sizeof(SessionInfoV1);
   pSessionInfo->V1.Rsv2 = 0;
@@ -392,6 +402,7 @@ void LoraStack_LoRaWAN::NetSaveSessionInfo(
     const uint8_t *pExtraSessionInfo,
     size_t nExtraSessionInfo
     ) {
+  LS_LOG_DEBUG(F("NetSaveSessionInfo %x" CR), &SessionInfo);
   if (SessionInfo.V1.Tag != kSessionInfoTag_V1) {
     LS_LOG_ERROR(F("Unknown session info tag %u expecting %u"), SessionInfo.V1.Tag, kSessionInfoTag_V1);
     return;
@@ -416,18 +427,19 @@ void LoraStack_LoRaWAN::NetSaveSessionInfo(
     LS_LOG_ERROR(F("Failed to save APPSKEY"));
     return;
   }
-  if (PS_SUCCESS!=_store.set("DEVADDR", SessionInfo.V1.FCntUp)) {
-    LS_LOG_ERROR(F("Failed to save DEVADDR"));
+  if (PS_SUCCESS!=_store.set("FCNTUP", SessionInfo.V1.FCntUp)) {
+    LS_LOG_ERROR(F("Failed to save FCNTUP"));
     return;
   }
-  if (PS_SUCCESS!=_store.set("DEVADDR", SessionInfo.V1.FCntDown)) {
-    LS_LOG_ERROR(F("Failed to save DEVADDR"));
+  if (PS_SUCCESS!=_store.set("FCNTDN", SessionInfo.V1.FCntDown)) {
+    LS_LOG_ERROR(F("Failed to save FCNTDN"));
     return;
   }
 }
 void LoraStack_LoRaWAN::NetSaveFCntUp(
     uint32_t uFcntUp
     ) {
+  LS_LOG_DEBUG(F("NetSaveFCntUp %d" CR), uFcntUp);
   if (PS_SUCCESS!=_store.set("FCNTUP", uFcntUp)) {
     LS_LOG_ERROR(F("Failed to save FCNTUP"));
   }
@@ -435,6 +447,7 @@ void LoraStack_LoRaWAN::NetSaveFCntUp(
 void LoraStack_LoRaWAN::NetSaveFCntDown(
     uint32_t uFcntDown
     ) {
+  LS_LOG_DEBUG(F("NetSaveFCntDown %d" CR), uFcntDown);
   if (PS_SUCCESS!=_store.set("FCNTDN", uFcntDown)) {
     LS_LOG_ERROR(F("Failed to save FCNTDN"));
   }
@@ -447,7 +460,14 @@ LoraStack::LoraStack(
     ttn_fp_t fp,
     uint8_t sf,
     uint8_t fsb)
-  : _lorawan(lorawan), _store(store) {
+  : _lorawan(lorawan), _store(store), _begun(false) {
+}
+
+bool LoraStack::begin() {
+  if (!_begun) {
+    _begun = _lorawan.begin();
+  }
+  return _begun;
 }
 
 bool LoraStack::join(
@@ -463,7 +483,7 @@ bool LoraStack::join(
   int8_t retries,
   uint32_t retryDelay) {
   // Initiate join with provisioned appEui, devEui, and appKey
-  
+  return begin();
 }
 
 uint8_t hexDigit(const char hex) {
@@ -474,12 +494,13 @@ uint8_t hexDigit(const char hex) {
     return ((uint8_t)hex) - 'A' + 0xA;
   }
   else if ('a'<=hex && hex<='f') {
-    return ((uint8_t)hex) - 'A' + 0xA;
+    return ((uint8_t)hex) - 'a' + 0xA;
   }
   return 16;
 }
 
 bool hexToBytes(uint8_t *buffer, uint16_t size, const char *hex) {
+  // LS_LOG_DEBUG("hexToBytes %s into len %d %x" CR, hex, (int)size, buffer);
   uint16_t i = 0;
   while (i<size && hex[0]!=0 && hex[1]!=0) {
     uint8_t msn = hexDigit(*hex++);
@@ -487,9 +508,40 @@ bool hexToBytes(uint8_t *buffer, uint16_t size, const char *hex) {
     if (msn==16 || lsn==16) {
       return false;
     }
-    buffer[i] = (msn<<4) + lsn;
+    buffer[i++] = (msn<<4) + lsn;
   }
   return (i==size) && *hex==0; // Used up input and filled buffer
+}
+
+bool LoraStack::personalize(
+  const char *devAddr,
+  const char *nwkSKey,
+  const char *appSKey) {
+  uint32_t devAddrLong = 0;
+  uint8_t nwkSKeyBytes[16];
+  uint8_t appSKeyBytes[16];
+
+  if (!hexToBytes((uint8_t *)&devAddrLong, sizeof(devAddrLong), devAddr)) {
+    LS_LOG_DEBUG(F("Failed to parse DevAddr: %s" CR), devAddr);
+    return false;
+  }
+  devAddrLong = ntohl(devAddrLong); // Correct for network byte ordering.
+  if (!hexToBytes(nwkSKeyBytes, sizeof(nwkSKeyBytes), nwkSKey)) {
+    LS_LOG_DEBUG(F("Failed to parse NwkSKey: %s"), nwkSKey);
+    return false;
+  }
+  if (!hexToBytes(appSKeyBytes, sizeof(appSKeyBytes), appSKey)) {
+    LS_LOG_DEBUG(F("Failed to parse AppSKey: %s"), appSKey);
+    return false;
+  }
+  // LS_LOG_DEBUG(F("Writing DEVADDR: %x" CR), devAddrLong);
+  int ret1 = _store.set("DEVADDR", devAddrLong);
+  // LS_LOG_DEBUG(F("Writing NWKSKEY: %*m" CR), sizeof(nwkSKeyBytes), nwkSKeyBytes);
+  int ret2 = _store.set("NWKSKEY", nwkSKeyBytes, sizeof(nwkSKeyBytes));
+  // LS_LOG_DEBUG(F("Writing APPSKEY: %*m" CR), sizeof(appSKeyBytes), appSKeyBytes);
+  int ret3 = _store.set("APPSKEY", appSKeyBytes, sizeof(appSKeyBytes));
+  // LS_LOG_DEBUG(F("Returning: %d %d %d" CR), ret1, ret2, ret3);
+  return ret1==PS_SUCCESS && ret2==PS_SUCCESS && ret3==PS_SUCCESS;
 }
 
 bool LoraStack::provision(
@@ -518,5 +570,42 @@ bool LoraStack::provision(
   int ret2 = _store.set("DEVEUI", devEuiBytes, sizeof(devEuiBytes));
   int ret3 = _store.set("APPKEY", appKeyBytes, sizeof(appKeyBytes));
   return ret1==PS_SUCCESS && ret2==PS_SUCCESS && ret3==PS_SUCCESS;
+}
+
+ttn_response_t LoraStack::sendBytes(
+  const uint8_t *payload,
+  size_t length,
+  port_t port,
+  bool confirm,
+  uint8_t sf) {
+  // TODO: port & sf
+  LS_LOG_DEBUG(F("Sending bytes: %*m" CR), length, payload);
+  bool ok = _lorawan.SendBuffer(payload, length, NULL, NULL, confirm);
+
+  if (ok) {
+    return TTN_SUCCESSFUL_TRANSMISSION;
+  }
+  else {
+    LS_LOG_ERROR(F("Error sending bytes." CR));
+    return TTN_ERROR_SEND_COMMAND_FAILED;
+  }
+}
+
+typedef void (*ReceiveBufferCbFn)(const uint8_t *payload, size_t size, port_t port);
+
+static void ReceiveBufferCb(
+  void *ctx,
+  const uint8_t *pBuffer,
+  size_t nBuffer) {
+  LS_LOG_DEBUG("Received message: %*m", nBuffer, pBuffer);
+  if (ctx) {
+    void (*cb)(const uint8_t *payload, size_t size, port_t port) = (ReceiveBufferCbFn)ctx;
+    cb(pBuffer, nBuffer, 1); // TODO: Port
+  }
+}
+
+void LoraStack::onMessage(void (*cb)(const uint8_t *payload, size_t size, port_t port)) {
+  LS_LOG_DEBUG("Register receive callback." CR);
+	_lorawan.SetReceiveBufferBufferCb(ReceiveBufferCb, (void *)cb);
 }
 

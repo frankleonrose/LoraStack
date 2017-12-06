@@ -104,6 +104,7 @@ class LoraStack {
   // https://github.com/TheThingsNetwork/arduino-device-lib/blob/master/src/TheThingsNetwork.h
   LoraStack_LoRaWAN &_lorawan;
   ParameterStore &_store;
+  bool _begun;
 
   public:
 
@@ -114,17 +115,18 @@ class LoraStack {
     uint8_t sf = TTN_DEFAULT_SF,
     uint8_t fsb = TTN_DEFAULT_FSB);
 
+  bool begin();
   // void reset(bool adr = true);
   // void showStatus();
   // size_t getHardwareEui(char *buffer, size_t size);
   // size_t getAppEui(char *buffer, size_t size);
-  // void onMessage(void (*cb)(const uint8_t *payload, size_t size, port_t port));
+  void onMessage(void (*cb)(const uint8_t *payload, size_t size, port_t port));
   bool provision(const char *appEui, const char *devEui, const char *appKey);
   bool join(const char *appEui, const char *devEui, const char *appKey, int8_t retries = -1, uint32_t retryDelay = 10000);
   bool join(int8_t retries = -1, uint32_t retryDelay = 10000);
-  // bool personalize(const char *devAddr, const char *nwkSKey, const char *appSKey);
+  bool personalize(const char *devAddr, const char *nwkSKey, const char *appSKey);
   // bool personalize();
-  // ttn_response_t sendBytes(const uint8_t *payload, size_t length, port_t port = 1, bool confirm = false, uint8_t sf = 0);
+  ttn_response_t sendBytes(const uint8_t *payload, size_t length, port_t port = 1, bool confirm = false, uint8_t sf = 0);
   // ttn_response_t poll(port_t port = 1, bool confirm = false);
   // void sleep(uint32_t mseconds);
   // void wake();
