@@ -18,11 +18,14 @@
   "dependencies":
   [
     {
+      "name": "MCCI Arduino LoRaWAN library",
       "version": "https://github.com/frankleonrose/arduino-lorawan.git#feat-platformio",
       "authors": ["Terry Moore <tmm@mcci.com>", "ChaeHee Won"]
     },
     {
-      "version": "https://github.com/frankleonrose/Arduino-logging-library.git"
+      "name": "Arduino Logging Library",
+      "version": "https://github.com/frankleonrose/Arduino-logging-library.git",
+      "authors": ["Bernd Klein <berndklein@gmx.de>", "Frank Leon Rose <frankleonrose@gmail.com>"]
     },
     {
       "name": "ParameterStore",
