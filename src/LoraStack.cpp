@@ -28,6 +28,18 @@ LoraStack_LoRaWAN::LoraStack_LoRaWAN(
   : Arduino_LoRaWAN_ttn(pinmap), _store(store) {
 }
 
+void reverseMem(uint8_t *ptr, size_t size) {
+  uint8_t *b = ptr;
+  uint8_t *e = ptr + size - 1;
+  while (b<e) {
+    uint8_t temp = *b;
+    *b = *e;
+    *e = temp;
+    b++;
+    e--;
+  }
+}
+
 bool LoraStack_LoRaWAN::GetOtaaProvisioningInfo(
     OtaaProvisioningInfo *pProvisioningInfo
   ) {
@@ -35,8 +47,12 @@ bool LoraStack_LoRaWAN::GetOtaaProvisioningInfo(
   static_assert(32==sizeof(OtaaProvisioningInfo), "Unexpected OTAA provisioning requirement");
   if (pProvisioningInfo) {
     int ret1 = _store.get("APPEUI", pProvisioningInfo->AppEUI, sizeof(pProvisioningInfo->AppEUI));
+    // In code hex strings and storage, store these MSB.
+    // For some reason, LoRaWAN code expects AppEUI & DevEUI reversed.
+    reverseMem(pProvisioningInfo->AppEUI, sizeof(pProvisioningInfo->AppEUI));
     int ret2 = _store.get("APPKEY", pProvisioningInfo->AppKey, sizeof(pProvisioningInfo->AppKey));
     int ret3 = _store.get("DEVEUI", pProvisioningInfo->DevEUI, sizeof(pProvisioningInfo->DevEUI));
+    reverseMem(pProvisioningInfo->DevEUI, sizeof(pProvisioningInfo->DevEUI));
     return ret1==PS_SUCCESS && ret2==PS_SUCCESS && ret3==PS_SUCCESS;
   }
   else {
@@ -200,7 +216,7 @@ bool LoraStack::join(
   int8_t retries,
   uint32_t retryDelay) {
   // Initiate join with provisioned appEui, devEui, and appKey
-  return begin();
+  return begin() && LMIC_startJoining();
 }
 
 uint8_t hexDigit(const char hex) {
