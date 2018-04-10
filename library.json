@@ -5,13 +5,13 @@
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/things-nyc/LoraStack.git"
+    "url": "https://github.com/frankleonrose/LoraStack.git"
   },
   "authors":
   [
     {
       "name": "Frank Leon Rose",
-      "email": "frank@thethings.nyc",
+      "email": "frose@thethings.nyc",
       "maintainer": true
     }
   ],
@@ -25,12 +25,12 @@
     {
       "name": "Arduino Logging Library",
       "version": "https://github.com/frankleonrose/Arduino-logging-library.git",
-      "authors": ["Bernd Klein <berndklein@gmx.de>", "Frank Leon Rose <frankleonrose@gmail.com>"]
+      "authors": ["Bernd Klein <berndklein@gmx.de>", "Frank Leon Rose <frose@thethings.nyc>"]
     },
     {
       "name": "ParameterStore",
       "version": "https://github.com/frankleonrose/ParameterStore.git",
-      "authors": ["Frank Leon Rose <frankleonrose@gmail.com>"]
+      "authors": ["Frank Leon Rose <frose@thethings.nyc>"]
     }
   ],
   "version": "0.1.0",
