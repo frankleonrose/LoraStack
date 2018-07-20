@@ -1,0 +1,20 @@
+language: python
+python:
+    - "2.7"
+
+sudo: false
+cache:
+    directories:
+        - "~/.platformio"
+
+install:
+    - pip install -U platformio
+
+script:
+    - mkdir test_platformio_deps
+    - cd test_platformio_deps
+    - mkdir src
+    - echo "int main() {}" > src/main.cpp
+    - printf "[env:adafruit_feather_m0]\nplatform = atmelsam\nboard = adafruit_feather_m0\nframework = arduino\nlib_deps = SPI, https://github.com/frankleonrose/LoraStack\nbuild_flags = -DCFG_us915\n" > platformio.ini
+    - platformio run
+

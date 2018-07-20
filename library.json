@@ -18,7 +18,7 @@
   "dependencies":
   [
     {
-      "name": "MCCI Arduino LoRaWAN library",
+      "name": "MCCI Arduino LoRaWAN Library",
       "version": "https://github.com/frankleonrose/arduino-lorawan.git#feat-platformio",
       "authors": ["Terry Moore <tmm@mcci.com>", "ChaeHee Won"]
     },
