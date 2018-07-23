@@ -1,6 +1,6 @@
 ![Build Status](https://travis-ci.org/frankleonrose/LoraStack.svg?branch=master)
 
-LoraStack is a high level library that uses the [MCCI LMiC LoRaWAN](https://github.com/frankleonrose/arduino-lorawan#node-projects) implementation
+LoraStack is a high level library that uses the [MCCI LMiC LoRaWAN](https://github.com/mcci-catena/arduino-lorawan) implementation
 combined with a flexible [ParameterStore](https://github.com/frankleonrose/ParameterStore) to present a simple API to `provision`, `join`, and
 `sendBytes` on [The Things Network](https://thethingsnetwork.org).
 
