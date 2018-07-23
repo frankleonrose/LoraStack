@@ -31,7 +31,7 @@ LoraStack_LoRaWAN::LoraStack_LoRaWAN(
   : Arduino_LoRaWAN_ttn(pinmap), _store(store) {
 }
 
-void reverseMem(uint8_t *ptr, size_t size) {
+static void reverseMem(uint8_t *ptr, size_t size) {
   uint8_t *b = ptr;
   uint8_t *e = ptr + size - 1;
   while (b<e) {
@@ -310,18 +310,28 @@ bool LoraStack::provision(
   return ret1==PS_SUCCESS && ret2==PS_SUCCESS && ret3==PS_SUCCESS && ret4==PS_SUCCESS;
 }
 
+/* static */ void LoraStack::txCallback(void *context_this, bool success) {
+  LoraStack *self = reinterpret_cast<LoraStack*>(context_this);
+  auto cb = self->_txCallback;
+  if (cb) {
+    self->_txCallback = nullptr;
+    cb(success);
+  }
+}
+
 ttn_response_t LoraStack::sendBytes(
   const uint8_t *payload,
   size_t length,
   port_t port,
   bool confirm,
+  std::function<void(bool)> cb,
   uint8_t sf) {
   // TODO: port & sf
-  LS_LOG_DEBUG(F("Sending bytes: %*m" CR), length, payload);
-  bool ok = _lorawan.SendBuffer(payload, length, NULL, NULL, confirm);
+  LS_LOG_DEBUG(F("Sending bytes: %*m with %s" CR), length, payload, confirm ? "ack" : "no ack");
+  bool ok = _lorawan.SendBuffer(payload, length, LoraStack::txCallback, this, confirm);
 
   if (ok) {
-    return TTN_SUCCESSFUL_TRANSMISSION;
+    return TTN_SUCCESSFUL_TRANSMISSION; // Successfully enqueued - NOT an indication that the message was received
   }
   else {
     LS_LOG_ERROR(F("Error sending bytes." CR));

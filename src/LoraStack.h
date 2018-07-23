@@ -105,7 +105,10 @@ class LoraStack {
   // https://github.com/TheThingsNetwork/arduino-device-lib/blob/master/src/TheThingsNetwork.h
   LoraStack_LoRaWAN &_lorawan;
   ParameterStore &_store;
-  bool _begun;
+  bool _begun = false;
+  std::function<void(bool)> _txCallback = nullptr;
+
+  static void txCallback(void *context_this, bool success);
 
   public:
 
@@ -116,6 +119,7 @@ class LoraStack {
     uint8_t sf = TTN_DEFAULT_SF,
     uint8_t fsb = TTN_DEFAULT_FSB);
 
+  void loop() { _lorawan.loop(); }
   bool begin();
   // void reset(bool adr = true);
   // void showStatus();
@@ -127,7 +131,7 @@ class LoraStack {
   bool join(int8_t retries = -1, uint32_t retryDelay = 10000);
   bool personalize(const char *devAddr, const char *nwkSKey, const char *appSKey);
   // bool personalize();
-  ttn_response_t sendBytes(const uint8_t *payload, size_t length, port_t port = 1, bool confirm = false, uint8_t sf = 0);
+  ttn_response_t sendBytes(const uint8_t *payload, size_t length, port_t port = 1, bool confirm = false, std::function<void(bool)> cb = nullptr, uint8_t sf = 0);
   // ttn_response_t poll(port_t port = 1, bool confirm = false);
   // void sleep(uint32_t mseconds);
   // void wake();
