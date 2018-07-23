@@ -1,7 +1,8 @@
+#include <functional>
 #include <Arduino.h>
 #include <Stream.h>
-// #include <avr/pgmspace.h>
 #include "lmic.h"
+#include "hal/hal.h"
 #include <Arduino_LoRaWAN_ttn.h>
 
 class ParameterStore;

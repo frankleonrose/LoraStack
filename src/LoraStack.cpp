@@ -4,6 +4,9 @@
  * Currently supports LoraWAN 1.0
  * Copyright (c) 2017 Frank Leon Rose
  */
+
+#include <functional> // Include standard libs before someone else #defines min/max etc.
+
 #include <Arduino.h>
 #include <SPI.h>
 #include "LoraStack.h"
