@@ -19,7 +19,7 @@
   [
     {
       "name": "MCCI Arduino LoRaWAN Library",
-      "version": "https://github.com/mcci-catena/arduino-lorawan.git",
+      "version": "https://github.com/frankleonrose/arduino-lorawan.git#feat-platformio",
       "authors": ["Terry Moore <tmm@mcci.com>", "ChaeHee Won"]
     },
     {
