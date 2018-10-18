@@ -11,5 +11,5 @@ install:
     - pip install -U https://github.com/platformio/platformio-core/archive/develop.zip
 
 script:
-    - pio ci examples/LoraStackBasic --lib src --project-option="lib_deps=https://github.com/mcci-catena/arduino-lorawan, https://github.com/mcci-catena/Catena-mcciadk, https://github.com/mcci-catena/arduino-lmic, https://github.com/frankleonrose/ParameterStore, https://github.com/JChristensen/Timer, SPI" --project-option="build_flags=-std=gnu++11, -DLOGGING_ARDUINO, -DCFG_us915" --board adafruit_feather_m0
+    - pio ci examples/LoraStackBasic --lib src --project-option="lib_deps=https://github.com/frankleonrose/arduino-lorawan.git#feat-platformio, https://github.com/mcci-catena/Catena-mcciadk, https://github.com/mcci-catena/arduino-lmic, https://github.com/frankleonrose/ParameterStore, https://github.com/JChristensen/Timer, SPI" --project-option="build_flags=-std=gnu++11, -DLOGGING_ARDUINO, -DCFG_us915" --board adafruit_feather_m0
 
