@@ -343,12 +343,13 @@ typedef void (*ReceiveBufferCbFn)(const uint8_t *payload, size_t size, port_t po
 
 static void ReceiveBufferCb(
   void *ctx,
+  uint8_t uPort,
   const uint8_t *pBuffer,
   size_t nBuffer) {
   LS_LOG_DEBUG("Received message: %*m", nBuffer, pBuffer);
   if (ctx) {
     void (*cb)(const uint8_t *payload, size_t size, port_t port) = (ReceiveBufferCbFn)ctx;
-    cb(pBuffer, nBuffer, 1); // TODO: Port
+    cb(pBuffer, nBuffer, uPort);
   }
 }
 
