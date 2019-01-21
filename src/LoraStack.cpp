@@ -28,7 +28,11 @@
 LoraStack_LoRaWAN::LoraStack_LoRaWAN(
   const lmic_pinmap &pinmap,
   ParameterStore &store)
-  : Arduino_LoRaWAN_ttn(pinmap), _store(store) {
+  : Arduino_LoRaWAN_ttn(), _store(store), _pinmap(pinmap) {
+}
+
+bool LoraStack_LoRaWAN::begin() {
+  return Arduino_LoRaWAN_ttn::begin(_pinmap);
 }
 
 static void reverseMem(uint8_t *ptr, size_t size) {

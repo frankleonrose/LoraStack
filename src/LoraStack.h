@@ -70,12 +70,14 @@ enum ttn_fp_t
 
 class LoraStack_LoRaWAN : public Arduino_LoRaWAN_ttn {
   ParameterStore &_store;
+  const lmic_pinmap &_pinmap;
 
   public:
   LoraStack_LoRaWAN();
   LoraStack_LoRaWAN(
     const lmic_pinmap &pinmap,
     ParameterStore &store);
+  bool begin();
   virtual bool GetOtaaProvisioningInfo(
 			OtaaProvisioningInfo *pProvisioningInfo
 	);
