@@ -34,8 +34,6 @@ LoraStack ttn(lorawan, gParameters, MY_FREQUENCY_PLAN);
 
 Timer gTimer;
 
-bool Serial_::dtr() { return true; } // Satisfy linkage for MCCI Arduino LoRaWAN Library/LogPrintf.cpp
-
 void setup() {
   bool status = ttn.join(appEui, devEui, appKey);
   if (!status) {
